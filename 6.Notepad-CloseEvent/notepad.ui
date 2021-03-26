@@ -52,6 +52,7 @@
     <addaction name="action_open"/>
     <addaction name="action_save"/>
     <addaction name="action_saveas"/>
+    <addaction name="action_close"/>
    </widget>
    <widget class="QMenu" name="menu_edit">
     <property name="title">
@@ -102,6 +103,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="action_close">
+   <property name="text">
+    <string>끝내기</string>
    </property>
   </action>
  </widget>
