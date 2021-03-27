@@ -2,8 +2,26 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5 import uic
 
+
+class findWindow(QDialog):
+    def __init__(self, parent):
+        super(findWindow, self).__init__(parent)
+        uic.loadUi(
+            "C:\\project-all\\Python\\pyqt\\10.Notepad-KeyboardEvent\\find.ui", self)
+        self.show()
+
+        self.pushButton_findnext.clicked.connect(self.findNext)
+        self.pushButton_cancle.clicked.connect(self.close)
+
+    def keyReleaseEvent(self, event):
+        if self.lineEdit.text():
+            self.pushButton_findnext.setEnabled(True)
+        else:
+            self.pushButton_findnext.setEnabled(False)
+
+
 form_class = uic.loadUiType(
-    "C:\\project-all\\Python\\pyqt\\7.Notepad-MessageBox\\notepad.ui")[0]
+    "C:\\project-all\\Python\\pyqt\\10.Notepad-KeyboardEvent\\notepad.ui")[0]
 
 
 class WindowClass(QMainWindow, form_class):
@@ -15,6 +33,13 @@ class WindowClass(QMainWindow, form_class):
         self.action_save.triggered.connect(self.saveFunction)
         self.action_saveas.triggered.connect(self.saveAsFunction)
         self.action_close.triggered.connect(self.close)
+
+        self.action_undo.triggered.connect(self.undoFunction)
+        self.action_cut.triggered.connect(self.cutFunction)
+        self.action_copy.triggered.connect(self.copyFunction)
+        self.action_paste.triggered.connect(self.pasteFunction)
+
+        self.action_find.triggered.connect(self.findFunction)
 
         self.opened = False
         self.opened_file_path = "제목 없음"
@@ -96,8 +121,24 @@ class WindowClass(QMainWindow, form_class):
         if fname[0]:
             self.save_file(fname[0])
 
+    def undoFunction(self):
+        self.plainTextEdit.undo()
 
-app = QApplication(sys.argv)
-mainWindow = WindowClass()
-mainWindow.show()
-app.exec_()
+    def cutFunction(self):
+        self.plaintTextEdit.cut()
+
+    def copyFunction(self):
+        self.plainTextEdit.copy()
+
+    def pasteFunction(self):
+        self.plainTextEdit.paste()
+
+    def findFunction(self):
+        findWindow(self)
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    mainWindow = WindowClass()
+    mainWindow.show()
+    app.exec_()

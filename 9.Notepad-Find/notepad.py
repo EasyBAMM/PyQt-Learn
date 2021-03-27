@@ -33,22 +33,42 @@ class WindowClass(QMainWindow, form_class):
         self.opened = False
         self.opened_file_path = "제목 없음"
 
+    def isChanged(self):
+        if not self.opened:  # 열린적은 없는데 에디터 내용이 있으면
+            if self.plainTextEdit.toPlainText().strip():
+                return True
+            return False
+
+        # 현재 데이터
+        current_data = self.plainTextEdit.toPlainText()
+        # 파일에 저장된 데이터
+        with open(self.opened_file_path, encoding="UTF8") as f:
+            file_data = f.read()
+
+        if current_data == file_data:   # 열린적이 있고 변경사항이 없으면
+            return False
+        else:   # 열린적이 있고 변경사항이 있으면
+            return True
+
     def save_changed_data(self):
+
         msgBox = QMessageBox()
         msgBox.setText("변경 내용을 {}에 저장하시겠습니까?".format(self.opened_file_path))
         msgBox.addButton("저장", QMessageBox.YesRole)  # 0
         msgBox.addButton("저장 안 함", QMessageBox.NoRole)  # 1
         msgBox.addButton("취소", QMessageBox.RejectRole)  # 2
         ret = msgBox.exec_()
-        if ret == 2:
+        if ret == 0:
+            self.saveFunction()
+        else:
             return ret
 
     def closeEvent(self, event):
-        ret = self.save_changed_data()
-        if ret == 2:
-            event.ignore()
-        print("close test")
-        # event.ignore()
+        if self.isChanged():    # 열린적이 있고 변경사항이 있으면, 열린적은 없는데 에디터 내용이 있으면
+            ret = self.save_changed_data()
+
+            if ret == 2:
+                event.ignore()
 
     def save_file(self, fname):
         data = self.plainTextEdit.toPlainText()
@@ -72,6 +92,9 @@ class WindowClass(QMainWindow, form_class):
         print("open {}!!".format(fname))
 
     def openFunction(self):
+        if self.isChanged():    # 열린적이 있고 변경사항이 있으면, 열린적은 없는데 에디터 내용이 있으면
+            ret = self.save_changed_data()
+
         fname = QFileDialog.getOpenFileName(self)
         if fname[0]:
             self.open_file(fname[0])
