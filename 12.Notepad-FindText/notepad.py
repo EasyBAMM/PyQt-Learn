@@ -1,14 +1,21 @@
 import sys
+from PyQt5.QtGui import QTextCursor
 from PyQt5.QtWidgets import *
 from PyQt5 import uic
+from PyQt5.QtGui import QTextCursor
+from PyQt5 import QtCore
 
 
 class findWindow(QDialog):
     def __init__(self, parent):
         super(findWindow, self).__init__(parent)
         uic.loadUi(
-            "C:\\project-all\\Python\\pyqt\\10.Notepad-KeyboardEvent\\find.ui", self)
+            "C:\\project-all\\Python\\pyqt\\12.Notepad-FindText\\find.ui", self)
         self.show()
+
+        self.parent = parent
+        self.cursor = parent.plainTextEdit.textCursor()
+        self.pe = parent.plainTextEdit
 
         self.pushButton_findnext.clicked.connect(self.findNext)
         self.pushButton_cancle.clicked.connect(self.close)
@@ -20,11 +27,24 @@ class findWindow(QDialog):
             self.pushButton_findnext.setEnabled(False)
 
     def findNext(self):
-        pass
+        pattern = self.lineEdit.text()
+        text = self.pe.toPlainText()
+
+        reg = QtCore.QRegExp(pattern)
+        index = reg.indexIn(text, 0)
+        if index != -1:  # 검색된 결과가 있다면
+            self.setCursor(index, len(pattern)+index)
+
+    def setCursor(self, start, end):
+        # print(self.cursor.selectionStart(), self.cursor.selectionEnd()) # 현재 커서 위치
+        self.cursor.setPosition(start)   # 앞에 커서를 찍고
+        self.cursor.movePosition(
+            QTextCursor.Right, QTextCursor.KeepAnchor, end-start)    # 뒤로 커서를 움직인다
+        self.pe.setTextCursor(self.cursor)
 
 
 form_class = uic.loadUiType(
-    "C:\\project-all\\Python\\pyqt\\10.Notepad-KeyboardEvent\\notepad.ui")[0]
+    "C:\\project-all\\Python\\pyqt\\12.Notepad-FindText\\notepad.ui")[0]
 
 
 class WindowClass(QMainWindow, form_class):
